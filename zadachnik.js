@@ -582,7 +582,7 @@ function finish(run) {
  });
  const stats = OgeCore.summary(run.res);
  run.code = OgeAssignments.encode('RES-', {v:3,n:run.name,k:run.kind,t:run.title,s:run.start,d:run.dur,h:run.assignment||undefined,
-  f:run.kind==='hw'?run.draftId:undefined,
+  f:run.kind==='hw'?(run.homeworkHash||run.draftId):undefined,
   r:run.res.map(([id,value,ok])=>[id.toString(36),value.slice(0,2000),ok])});
  history = LS.get('mk_hist', history);
  if (!history.some(record => record.code === run.code)) history.unshift({k:run.kind,t:run.title,s:run.start,d:run.dur,sc:stats.correct,n:stats.automatic,pending:stats.pending,code:run.code});
@@ -615,13 +615,26 @@ function renderResult(run) {
  const msg=`${run.name||myName||'Ученик'}: ${run.title}. Автопроверка: ${stats.correct}/${stats.automatic}. На проверке у преподавателя: ${stats.pending}. Пропущено: ${counts.empty}. Время ${fmtTime(run.dur)}.\nКод результата: ${run.code}`;
  V.innerHTML=`<section class="view study-result"><div class="hero"><h1 tabindex="-1">${esc(run.title)}</h1><p class="lead">Автопроверка: <b>${stats.correct} из ${stats.automatic}</b></p></div>
  <dl class="result-overview">${Object.entries(resultStates).map(([state,{label,symbol}])=>`<div class="result-${state}"><dt><span aria-hidden="true">${symbol}</span>${label}</dt><dd>${counts[state]}</dd></div>`).join('')}</dl>
- <div class="panel result-share"><h2>Отправь преподавателю</h2><p>${run.persistError?'Браузер не сохранил результат. Скопируй сообщение сейчас.':'Скопируй сообщение и приложи фотографии бумажных решений.'}</p><textarea id="msg" rows="4" aria-label="Сообщение преподавателю" readonly>${esc(msg)}</textarea><button class="btn primary" id="cp">Скопировать сообщение</button></div>
+ <div class="panel result-share"><h2>Отправь преподавателю</h2><p>${run.persistError?'Браузер не сохранил результат. Скопируй сообщение сейчас.':'Скопируй сообщение и приложи фотографии бумажных решений.'}</p><textarea id="msg" rows="4" aria-label="Сообщение преподавателю" readonly>${esc(msg)}</textarea><button class="btn primary" id="cp">Скопировать сообщение</button>${window.OgeCloud?.session()?.role==='student'?'<button class="btn" id="save-in-cloud">Сохранить в кабинете</button><p id="cloud-save-status" role="status"></p>':''}</div>
  <div class="rlist">${answers.map(({id,value,state},i)=>{
   const row=runTask(run,id), {label,symbol}=resultStates[state];
   return `<article class="ri result-${state}"><div class="result-card-heading"><b>№${i+1} · ${esc(row?taskLabel(row):'Задание')}</b><span class="result-status"><span aria-hidden="true">${symbol}</span>${label}</span></div>${row?`<p>${fmtText(row[6].slice(0,220))}</p>`:''}${state==='empty'?'':`<p class="result-answer">Твой ответ: ${esc(value)}</p>`}${state==='error'&&row?`<p>Правильный ответ: ${esc(row[4])}</p>`:''}${row?.[1]?`<a href="${link(row)}" target="_blank" rel="noopener">Разбор ↗</a>`:''}</article>`;
  }).join('')}</div>
  <div class="study-actions"><button class="btn" id="again">${run.kind==='hw'?'К домашкам':'Новый вариант'}</button><button class="btn" id="toprog">Мой прогресс</button></div></section>`;
  V.querySelector('#cp').onclick=()=>copy(msg,V.querySelector('#msg'));
+ const cloudSave=V.querySelector('#save-in-cloud');
+ if (cloudSave) cloudSave.onclick=async()=>{
+  const status=V.querySelector('#cloud-save-status');
+  cloudSave.disabled=true;
+  try {
+   const assignmentId=run.cloudAssignmentId||null;
+   await OgeCloud.request('me/results',{method:'POST',data:{code:run.code,assignmentId,...stats}});
+   status.textContent='Результат сохранён. Он доступен в кабинете и в журнале преподавателя.';
+  } catch(error) {
+   status.textContent=error.message;
+   cloudSave.disabled=false;
+  }
+ };
  V.querySelector('#again').onclick=()=>leaveRun(run);
  V.querySelector('#toprog').onclick=()=>leaveRun(run,'prog');
 }
@@ -657,17 +670,18 @@ async function homeworkRows(hw) {
  }));
 }
 let homeworkOpenRequest=0;
-async function openHomework(text) {
+async function openHomework(text, cloudAssignmentId = null) {
  const request=++homeworkOpenRequest;
  const hw=OgeAssignments.homework(text);
- const draftId = await OgeAssignments.homeworkHash(hw.code);
- const legacy = drafts.legacyHomework(hw.code);
+ const homeworkHash = await OgeAssignments.homeworkHash(hw.code);
+ const draftId = cloudAssignmentId ? `${homeworkHash}_${cloudAssignmentId}` : homeworkHash;
+ const legacy = cloudAssignmentId ? null : drafts.legacyHomework(hw.code);
  const active = drafts.active('hw');
- const saved = drafts.homework(draftId) || (active?.hw === hw.code ? active : null);
+ const saved = drafts.homework(draftId) || (!cloudAssignmentId && !active?.cloudAssignmentId && active?.hw === hw.code ? active : null);
  const taskRows=hw.ids.every(id=>saved?.taskRows?.[id]?.[0]===id)?saved.taskRows:await homeworkRows(hw);
  if(request!==homeworkOpenRequest)return null;
  const run = {kind:'hw',title:hw.title,answers:{},start:legacy?.start||Date.now(),limit:0,done:false,...saved,
-  ids:hw.ids,taskRows,hw:hw.code,draftId,assignment:hw.assignment,unsaved:{}};
+  ids:hw.ids,taskRows,hw:hw.code,draftId,homeworkHash,cloudAssignmentId,assignment:hw.assignment,unsaved:{}};
  if (!saved && legacy?.answers) run.answers = {...legacy.answers};
  syncAnswers(run);
  runs.hw = run;
@@ -726,7 +740,9 @@ async function openLinkedHomework() {
  V.innerHTML='<section class="view"><div class="hero"><h1>Домашка</h1></div><div class="panel study-form"><p id="study-loading" role="status">Загружаем задания…</p><div><button class="btn primary" id="retry-homework" hidden>Попробовать снова</button></div></div></section>';
  const status = V.querySelector('#study-loading'), retry=V.querySelector('#retry-homework');
  try {
-  await openHomework(code || (await OgePublished.load(preset)).code);
+  const issued = new URLSearchParams(location.search).get('assignment');
+  const cloudAssignmentId = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(issued || '') ? issued : null;
+  await openHomework(code || (await OgePublished.load(preset)).code, cloudAssignmentId);
   if (status.isConnected) render();
  } catch (error) {
   if (status.isConnected) {status.textContent=error.message;retry.hidden=false;retry.onclick=openLinkedHomework;}
@@ -777,7 +793,7 @@ if (!embedded) (async () => {
    if (await openLinkedHomework()) return;
    const saved = drafts.active('hw');
    if (!runs.hw && saved?.hw && !saved.done) {
-    try { await openHomework(saved.hw); }
+    try { await openHomework(saved.hw, saved.cloudAssignmentId); }
     catch (error) { toast(error.message); }
    }
   })(),

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.workers.dev; base-uri 'none'; form-action 'none'">
+  <title>Учебный кабинет · INVARIANT</title>
+  <link rel="stylesheet" href="account.css">
+  <script src="cloud-client.js" defer></script>
+  <script src="account.js" defer></script>
+</head>
+<body>
+  <header><a href="index.html">INVARIANT</a><a href="index.html">Задачник</a></header>
+  <main>
+    <div class="account-heading">
+      <h1 id="heading">Учебный кабинет</h1>
+      <button id="sign-out" type="button" hidden>Выйти</button>
+    </div>
+    <p id="status" role="status" aria-live="polite"></p>
+    <section id="sign-in" class="panel" hidden>
+      <p>Введи личный код доступа, который выдал преподаватель.</p>
+      <form id="login">
+        <label>Код доступа <input name="accessKey" type="password" maxlength="45" minlength="45" autocomplete="current-password" required></label>
+        <button class="primary" type="submit">Войти</button>
+      </form>
+    </section>
+    <div id="workspace"></div>
+  </main>
+</body>
+</html>

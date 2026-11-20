@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node scripts/verify-learning.cjs && node scripts/verify-frog.cjs
+      - run: node scripts/verify-learning.cjs && node scripts/verify-frog.cjs && node scripts/verify-accounts.mjs
       - run: npm install --no-save --no-package-lock playwright-core@1.65.1
       - run: npx playwright-core install --with-deps chromium
       - run: node scripts/verify-study-flows.cjs

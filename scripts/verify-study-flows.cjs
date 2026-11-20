@@ -10,7 +10,7 @@ const { execFileSync } = require('node:child_process');
 const { chromium } = require('playwright-core');
 
 const root = path.resolve(__dirname, '..');
-const prefix = '/zadachnik-oge/';
+const prefix = '/zadachnik/';
 const mime = {'.js':'application/javascript','.html':'text/html; charset=utf-8','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'};
 const server = http.createServer((request,response)=>{
   const route = new URL(request.url,'http://localhost').pathname;
@@ -36,10 +36,12 @@ async function openPreset(page, landing, quiz, written) {
 
 async function checkStartupLoader(browser,base) {
   const context=await browser.newContext({baseURL:base,viewport:{width:390,height:844}});
+  let releaseIntro;
+  const introGate = new Promise(resolve => { releaseIntro = resolve; });
   try {
     const page=await context.newPage();
     await page.route('**/bank/intro.js*',async route=>{
-      await new Promise(resolve=>setTimeout(resolve,550));
+      await introGate;
       await route.continue();
     });
     await page.goto('index.html',{waitUntil:'commit'});
@@ -50,11 +52,12 @@ async function checkStartupLoader(browser,base) {
     assert.equal(await overlay.locator('.physics-lab-orbits').evaluate(node=>getComputedStyle(node).animationName),'physics-lab-orbit');
     await page.emulateMedia({reducedMotion:'reduce'});
     assert.equal(await overlay.locator('.physics-lab-orbits').evaluate(node=>getComputedStyle(node).animationName),'none');
+    releaseIntro();
     await overlay.waitFor({state:'detached'});
     await page.locator('.bank-title, #bank-topics').first().waitFor();
     await page.goto('index.html?workspace=1');
     assert.equal(await overlay.count(),0);
-  }finally{await context.close()}
+  }finally{releaseIntro();await context.close()}
 }
 async function checkPublic(browser, base) {
   const context = await browser.newContext({baseURL:base,viewport:{width:390,height:844},hasTouch:true,isMobile:true});
@@ -282,7 +285,7 @@ async function checkTeacher(browser,base,bank,source) {
   const {fixture,password}=makeTeacherFixture(source,fixtureBank);
   const context=await browser.newContext({baseURL:base,permissions:['clipboard-read','clipboard-write']});
   async function useFixture(target) {
-    await target.route('**/zadachnik-oge/**',async route=>{
+    await target.route(`**${prefix}**`,async route=>{
       const file=new URL(route.request().url()).pathname.slice(prefix.length);
       if (!['teach.html','teacher-workspace.enc.json','zhurnal.html'].includes(file)) return route.continue();
       if(file==='teacher-workspace.enc.json')await new Promise(resolve=>setTimeout(resolve,250));

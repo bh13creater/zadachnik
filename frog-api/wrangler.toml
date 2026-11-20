@@ -2,6 +2,7 @@ name = "zadachnik-oge-frog"
 main = "worker.mjs"
 compatibility_date = "2026-10-01"
 workers_dev = true
+preview_urls = false
 
 [vars]
 FROG_ORIGINS = "https://bh13creater.github.io"
