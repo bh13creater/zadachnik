@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="333" height="39" viewBox="0 0 333 39" role="img" aria-labelledby="title">
+  <title id="title">INVARIANT</title>
+  <style>
+    @media (prefers-reduced-motion: no-preference) {
+      .reflection { animation: sweep 6s linear infinite; }
+    }
+    @keyframes sweep { to { transform: translateX(-168px); } }
+  </style>
+  <defs>
+    <path id="i" d="M0 4h10v31H0z"/>
+    <path id="n" d="M0 4h11l16 19V4h9v31H25L9 16v19H0z"/>
+    <path id="v" d="M0 4h10.5l8 21 8-21H37L23 35h-9z"/>
+    <path id="a" fill-rule="evenodd" d="M14.5 4h8L38 35H27.5l-2.6-6H13.1l-2.6 6H0Zm4.5 10.1L15.8 22h6.4z"/>
+    <path id="r" fill-rule="evenodd" d="M0 4h23q13 0 13 10.2 0 7.5-7.5 9.3L38 35H25.6l-8.4-10.7H9.8V35H0Zm9.8 7.8v5h11.8q4.5 0 4.5-2.5t-4.5-2.5z"/>
+    <path id="t" d="M0 4h34v8.3H21.9V35h-9.8V12.3H0z"/>
+    <g id="letters">
+      <use href="#i" x="4"/>
+      <use href="#n" x="22"/>
+      <use href="#v" x="64"/>
+      <use href="#a" x="106"/>
+      <use href="#r" x="150"/>
+      <use href="#i" x="195"/>
+      <use href="#a" x="211"/>
+      <use href="#n" x="255"/>
+      <use href="#t" x="295"/>
+    </g>
+    <mask id="face" maskUnits="userSpaceOnUse" x="0" y="0" width="333" height="39"><use href="#letters" fill="white"/></mask>
+    <linearGradient id="silver" x1="0%" y1="16%" x2="100%" y2="84%">
+      <stop stop-color="#adbeed"/>
+      <stop offset=".23" stop-color="#deeffc"/>
+      <stop offset=".46" stop-color="#edf5fc"/>
+      <stop offset=".69" stop-color="#c6daef"/>
+      <stop offset="1" stop-color="#adb8ea"/>
+    </linearGradient>
+    <linearGradient id="glint" gradientUnits="userSpaceOnUse" x2="168" y2="0" gradientTransform="skewX(-21)" spreadMethod="repeat">
+      <stop stop-color="#88b6fd" stop-opacity="0"/>
+      <stop offset=".23" stop-color="#88b6fd" stop-opacity="0"/>
+      <stop offset=".39" stop-color="#91dbff" stop-opacity=".47"/>
+      <stop offset=".48" stop-color="#f1fffe" stop-opacity=".68"/>
+      <stop offset=".58" stop-color="#ddd8ff" stop-opacity=".45"/>
+      <stop offset=".78" stop-color="#b7baff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#b7baff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <use href="#letters" transform="translate(-.85 .1)" fill="#56acff" opacity=".76"/>
+  <use href="#letters" transform="translate(.8 .18)" fill="#f5d293" opacity=".63"/>
+  <g mask="url(#face)">
+    <rect width="333" height="39" fill="url(#silver)"/>
+    <rect width="510" height="39" fill="url(#glint)" class="reflection"/>
+  </g>
+</svg>

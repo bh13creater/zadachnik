@@ -1,0 +1,83 @@
+# Состояние доработки кабинета
+
+Дата: 3 ноября 2026. Приоритет пользователя: открыть готовый блок и провести урок без долгого подбора материалов. Аккаунты и необязательная декоративная работа отложены.
+
+## Реализовано
+
+- `teach.html`, `teach.css`, `teach.js`: единый маршрут урока, локальные профили учеников, памятка, объяснение, совместная/самостоятельная работа, выбор задач, версии ДЗ, проверка, освоение тем и общая резервная копия.
+- `practice-data.js`: 464 уникальные авторские карточки; готовая практика для 56 занятий, две задачи на графики к каждому занятию. Контрольные занятия используют карточки из соответствующих тем.
+- `learning-core.js`: строгая проверка чисел и последовательностей; отсутствие автоматического ключа означает ручную проверку, а не ошибку.
+- Закрытый банк подключается после входа в существующий журнал через проверяемый по origin/source обмен между страницами. Пароль и расшифрованный банк не включены в новые файлы.
+- Исходный задачник: постоянные номера при фильтрации и в домашках; письменные ответы; результаты с ожидающими проверки заданиями; запрет частичного открытия повреждённой подборки.
+- Доска: снимок привязан к ученику и задаче; сохранение перед закрытием/сменой задачи, обработка потери указателя; экспорт большого рисунка без обрезания.
+- Тренажёр графиков: формулы подписаны как перемещение, путь суммирует площади по модулю, области ниже оси отрисовываются корректно.
+- Общая навигация и светлая/тёмная темы.
+
+## Проверено до публикации
+
+- `node scripts/verify-learning.cjs`: проходит.
+- Авторская ДЗ из 10 задач открывается ученику с графиками; восемь числовых ответов приняты, два письменных ожидают ручной проверки.
+- Результат возвращается в кабинет, комментарий и ручная оценка сохраняются после перезагрузки.
+- Фото сохраняется, входит в JSON-копию; копия не содержит пароль журнала. Повторный импорт объединяет записи.
+- Вход в прежний защищённый банк, постоянные номера блока 7, открытие задачи №10 с рисунком во встроенной доске.
+- Штрих остаётся после быстрого закрытия и открытия доски.
+- Домашка из исходного закрытого банка открывается с правильными номерами и изображениями.
+
+## Финальная проверка
+
+- Проверены итоговый diff, отсутствие учётных данных в новых файлах и неизменность зашифрованного банка.
+- Сохранённая версия ДЗ открывается после перезагрузки без повторного входа в банк; постоянные номера сохранены.
+- В тренажёре проверен разворот: v₀=4, a=−2, t=4; перемещение 0 м, путь 8 м.
+- Публикация и проверка публичной версии выполняются после этого коммита.
+
+## Сознательно отложено
+
+Полная независимая проверка всех 602 исходных ключей/таблиц; собственный сервер совместной доски; аккаунты и облачная синхронизация; расширенные игры/питомцы. Авторские карточки дают готовую тренировку, но не заменяют полный официальный банк и проверку экзаменационных развёрнутых работ.
+
+## Приватный вход — 3 ноября
+
+По запросу пользователя кабинет и маршрут защищены паролем журнала. HTML, сценарии, план и практика помещены в AES-GCM-контейнеры. Открытые преподавательские исходники и Markdown больше не раздаются текущей версией Pages; редактируемые копии сохранены в `../site-private-source/`. Ученическая навигация не содержит преподавательских ссылок без входа. Ключ доступа действует в текущей вкладке до выхода; кнопка выхода блокирует также встроенный план. Пароль не сохраняется новым входом и не попадает в исходники/резервные копии. Ранее опубликованные учебные материалы могут оставаться в истории GitHub; это не серверная система аккаунтов. Личные записи по-прежнему локальны.
+
+## Запоминаемое устройство
+
+По дополнительному запросу пользователя в общую навигацию возвращён пункт «🔒 Журнал репетитора», ведущий в закрытый кабинет. Форма предлагает «Запомнить это устройство» (включено по умолчанию). Сохраняется ключ доступа в localStorage текущего браузера; пароль не сохраняется. Выход удаляет и ключ устройства, и ключ вкладки. Без отметки используется только сессия вкладки. Новая авторизация не попадает в резервные копии пользовательских записей.
+
+## 2026-11-05 — readable light theme and laboratory hub
+- Flat white task/lesson surfaces in light mode, dark readable text, solid success state and readable board/task overlays.
+- New laboratory.html hub: existing density experiment plus spring stiffness, sliding friction and resistance trainers. Three measurements, persisted tables, decimal-comma answer checks, worked calculation, notebook report and print action.
+- Models explicitly identified as idealized training, not the complete official OGE experimental bank. Shared navigation now opens the hub; density has a return link.
+- Refreshed shared asset versions, including styles loaded by the encrypted teacher workspace. Password gate and encrypted bundles preserved.
+- Verified: existing learning verification passes (56 lessons/464 unique author tasks), browser spring measurements and persistence after reload, friction 0,3, resistance 20 and malformed-input rejection, light card computed white background/no background image/dark text.
+
+## 2026-11-05 — animated laboratory models
+- Persistent SVG scenes: spring extension and suspended load move smoothly as mass changes; a complete friction rig moves at constant speed with balanced force arrows; conventional-current markers travel around the main circuit and respond to voltage.
+- Start/pause/replay controls, spring demonstration through three masses, automatic stop after the friction pass, page-hidden pause, reduced-motion alternative. Numeric readings stay fixed in place and existing tables/checks are preserved.
+- Browser checked spring automatic progression to 300 g, moving friction transform, pause and recording 400 g / 1.2 N, switching to Ohm scene and moving current markers. Existing learning validation passed.
+
+## 2026-11-05 — pixel frog physics helper
+- Added reference-inspired pixel SVG frog throughout the shared site shell, with idle hops/blinks, pointer-following pupils, and mouth animation during typed text.
+- Click to request context-sensitive laboratory formulas or physics facts; occasional quiet fact bubbles, close/Escape, persistent show/hide control in navigation, reduced-motion handling. No AI API, audio, or external service used.
+- Embedded workspace resources omit the helper to avoid duplicate floating widgets. Existing password gates remain intact.
+- Browser verified: spring-specific Hooke-law hint, talking state, pupils moving to (-3,-2), fact button, hiding retained across reload, restoring from navigation. Learning checks pass.
+
+## 2026-11-05 — cute frog and block-specific hints
+- Replaced oversized square pupils with smaller soft eyes, highlights, blush and a gentler smile; cursor tracking/blinking/talking retained.
+- Added task-bank block selector (1–23 plus bonus), remembering the choice. Selecting a block immediately tells a related fact; formula/fact/next stay within that block. Auto mode follows the most recently clicked task-bank block and retains laboratory context when no task block is selected.
+- Titles cross-checked against original journal metadata; no bank codes, task solutions or credentials added to public files. Added original short hints with conditions on formula use.
+- Verified coverage for all 24 entries; browser checked block 7 fact/F=ma, selected block surviving reload, auto detection of block 1, and updated appearance. Existing learning checks pass.
+
+## 2026-11-05 — free coaching without homework spoilers
+- Added plain-language explanations for all 23 task-bank blocks plus bonus, and start/self-check/stuck checklists. This is fixed content, not AI or automatic evaluation of a student's reasoning.
+- Pending homework/tests switch the frog to generic coaching only: no formulas, topical facts, simple explanations, block switching, automatic fact bubbles or answer-dependent hints. Existing speech closes immediately on the mode change.
+- Assessment state is signalled by the task app and checked against saved unfinished runs, including reload and other same-profile tabs/pages. Submitting/ending a run restores learning hints. This does not restrict access to other educational pages or act as exam security.
+- Browser verified full transition: training explanation → pending one-task homework → restricted buttons → reload → restriction on lab tab → submission restores normal hints across tabs. Added verify-frog.cjs checks for hw/test detection, completion, all 24 explanations, restricted routing and capped prompts. Existing learning checks pass.
+
+## 2026-11-05 — remove generic frog coaching at user's request
+- Removed the generic start/self-check/stuck/simple-explanation buttons and their content. Retained block formulas/facts and the animated frog.
+- During an unfinished homework/test, the frog closes its bubble and rests silently; no clickable tips or automatic speeches. Assessment protection and cross-tab state remain.
+- Verified learning/frog checks and browser: only formula/fact/next in study mode; starting a test disables speech and closes an existing bubble on another page.
+
+## 2026-11-07 — follow-up homework after friction, weight and Newton's law
+- Added homework-friction.html with a shareable native homework launch, six original scaffolded tasks, block 9 tasks 3/23 and block 7 tasks 9/10. Eight automatic items plus two written explanations. Source labels and normal result submission preserved.
+- Added two interactive SVG demonstrations: static/sliding friction with Newton's law and camera-following motion; normal reaction/weight for supported, upward-pulled and freely falling bodies. Explicit controls, pauses, reduced motion, physics-based free-fall displacement.
+- Local browser verified static friction matching 4 N pull, sliding transition at 6 N, reaction 6 N with 4 N upward pull, weightless state with gravity retained, 10 homework rows with source labels. Submitted reference answers yield 8/8 automatic and 2 awaiting teacher review. Graph keys independently checked from source images.

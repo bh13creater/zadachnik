@@ -1,0 +1,15 @@
+.physics-wordmark {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 333 / 39;
+}
+
+.physics-wordmark img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+html[data-theme="light"] .physics-wordmark img {
+  filter: brightness(.65) saturate(1.24);
+}

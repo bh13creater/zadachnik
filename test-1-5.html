@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Тест · Кинематика 1–5</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#060A17}
+:root{color-scheme:dark;--bg:#060A17;--bg2:#0B1226;--panel:#0F1830;--line:#1E2A4A;--line2:#2B3A63;--text:#E9EEFF;--text2:#9AA6C8;--cyan:#3BE3FF;--pink:#FF5FD2;--amber:#FFBE55;--green:#35F2A2;--red:#FF5C7A}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding-block:20px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:28px;line-height:1.2;margin:8px 0 6px}
+h1 .g{background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--text2);margin:0 0 18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.top{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.top input{flex:1;min-width:180px}
+input[type=text]{background:var(--bg2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;outline:none}
+input[type=text]:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(59,227,255,.15)}
+.btn{border:1px solid var(--line2);background:var(--bg2);color:var(--text);font:600 15px inherit;font-family:inherit;padding:10px 16px;border-radius:11px;cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--cyan),#7FF0FF);color:#04111A;border-color:transparent}
+.btn:hover{border-color:var(--cyan)}
+.prog{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(6,10,23,.9);backdrop-filter:blur(10px);margin:14px -16px 0;padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text2)}
+.bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .3s}
+.sec{margin:28px 0 10px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);font-weight:700}
+.task{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.task.ok{border-color:rgba(53,242,162,.6)}
+.task.bad{border-color:rgba(255,92,122,.6)}
+.task .n{display:inline-block;min-width:30px;color:var(--pink);font-weight:800}
+.task .tag{font-size:12px;color:var(--amber);margin-left:6px}
+.task p{margin:4px 0 10px}
+.task ol{margin:6px 0 10px;padding-left:22px;color:var(--text)}
+.task ol li{margin:3px 0}
+.ans{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ans input{width:160px}
+.ans .u{color:var(--text2);font-size:14px}
+.verdict{font-size:14px;font-weight:600}
+.verdict.ok{color:var(--green)}
+.verdict.bad{color:var(--red)}
+svg.gr{display:block;width:100%;max-width:440px;margin:6px 0 12px;background:#0A1124;border:1px solid var(--line);border-radius:12px}
+.f{font-family:"SF Mono",Menlo,Consolas,monospace;color:var(--cyan);white-space:nowrap}
+.res{margin-top:24px}
+.score{font-size:40px;font-weight:800}
+.muted{color:var(--text2);font-size:14px}
+textarea{width:100%;min-height:120px;background:var(--bg2);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:10px;font:13px/1.4 Menlo,Consolas,monospace}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+@media (max-width:520px){h1{font-size:23px}.ans input{width:130px}}
+</style>
+<link rel="stylesheet" href="site-shell.css?v=20261105quiet"><script src="site-shell.js?v=frog-ai-2" defer></script></head>
+<body>
+<div class="wrap">
+  <div class="muted">Задачник по механике · ОГЭ</div>
+  <h1>Тест: <span class="g">кинематика, уроки 1–5</span></h1>
+  <p class="lead">15 задач: равномерное движение, графики x(t) и v(t), ускорение, свободное падение, движение по окружности. Решай на листочке, сюда вписывай только ответ. Десятичные дроби пиши через запятую, например 2,5. В задачах «выберите два верных утверждения» пиши две цифры, например 14. Ответы сохраняются, можно закрыть страницу и вернуться. g = 10 м/с², π ≈ 3,14.</p>
+
+  <div class="panel top">
+    <input type="text" id="name" placeholder="Твоё имя" aria-label="Имя">
+    <span class="muted" id="startInfo"></span>
+  </div>
+
+  <div class="prog"><span id="cnt">0 / 15</span><div class="bar"><i id="barI"></i></div></div>
+
+  <div id="tasks"></div>
+
+  <div class="row"><button class="btn primary" id="finish">Завершить тест и проверить</button></div>
+
+  <div class="panel res" id="res" hidden>
+    <div class="muted">Результат</div>
+    <div class="score" id="score"></div>
+    <div class="muted" id="scoreInfo"></div>
+    <p>Скопируй этот текст и отправь репетитору:</p>
+    <textarea id="report" readonly></textarea>
+    <div class="row"><button class="btn" id="copy">Скопировать</button><button class="btn" id="again">Начать заново</button></div>
+  </div>
+</div>
+
+<script src="learning-core.js?v=homework-review-1"></script>
+<script src="assignment-code.js?v=homework-review-1"></script>
+<script src="kinematics-test.js?v=20261116"></script>
+<script>
+const { questions:ALL, rows, graph } = OgeKinematics;
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const KEY='mk_test15b';
+let st=LS.get(KEY,null)||{ans:{},start:Date.now(),done:false,name:''};
+
+const norm=s=>String(s||'').trim();
+
+function render(){
+  let h='',last='',i=0;
+  for(const t of ALL){
+    if(t.h!==last){h+=`<div class="sec">${t.h}</div>`;last=t.h}
+    i++;
+    h+=`<div class="task" id="t${i}"><p><span class="n">${i}.</span>${t.q}</p>${t.g?graph(t.g):''}${t.list?'<ol>'+t.list.map(x=>`<li>${x}</li>`).join('')+'</ol>':''}
+    <div class="ans"><input type="text" inputmode="${t.k==='m2'?'numeric':'decimal'}" data-i="${i-1}" placeholder="ответ" aria-label="Ответ к задаче ${i}"><span class="u">${t.u}</span><span class="verdict"></span></div></div>`;
+  }
+  document.getElementById('tasks').innerHTML=h;
+  document.querySelectorAll('.ans input').forEach(inp=>{
+    inp.value=st.ans[inp.dataset.i]||'';
+    inp.addEventListener('input',()=>{st.ans[inp.dataset.i]=inp.value;LS.set(KEY,st);progress()});
+  });
+  const nm=document.getElementById('name');nm.value=st.name||'';nm.addEventListener('input',()=>{st.name=nm.value;LS.set(KEY,st)});
+  progress();
+  if(st.done)finish(true);
+}
+function progress(){
+  const n=Object.values(st.ans).filter(v=>norm(v)).length;
+  document.getElementById('cnt').textContent=n+' / '+ALL.length;
+  document.getElementById('barI').style.width=(n/ALL.length*100)+'%';
+  const m=Math.round((Date.now()-st.start)/60000);
+  document.getElementById('startInfo').textContent=st.done?'тест завершён':'идёт '+m+' мин';
+}
+setInterval(progress,30000);
+
+function finish(silent){
+  const empty=ALL.filter((t,i)=>!norm(st.ans[i])).length;
+  const fb=document.getElementById('finish');
+  if(!silent&&!st.done&&empty&&!fb.dataset.armed){fb.dataset.armed=1;fb.textContent='Без ответа задач: '+empty+'. Нажми ещё раз, чтобы завершить';return}
+  if(!st.done){st.done=true;st.end=Date.now();LS.set(KEY,st)}
+  let ok=0;const lines=[], answers=[];
+  ALL.forEach((t,i)=>{
+    const g=st.ans[i]||'',r=OgeCore.correct(rows[i],g);if(r)ok++;
+    const box=document.getElementById('t'+(i+1));box.classList.add(r?'ok':'bad');
+    const inp=box.querySelector('input');inp.readOnly=true;
+    box.querySelector('.verdict').className='verdict '+(r?'ok':'bad');
+    box.querySelector('.verdict').textContent=r?'верно':'неверно · правильный ответ: '+t.a;
+    answers.push([rows[i][0].toString(36),g,r?1:0]);
+    lines.push(`${i+1}. ${r?'✔':'✘'} ответ: ${g||'—'}${r?'':' (верно: '+t.a+')'}`);
+  });
+  const mins=Math.round(((st.end||Date.now())-st.start)/60000);
+  document.getElementById('res').hidden=false;
+  document.getElementById('score').textContent=ok+' / '+ALL.length;
+  document.getElementById('scoreInfo').textContent='Время: '+mins+' мин';
+  document.getElementById('report').value=`Тест «Кинематика 1–5» · ${st.name||'без имени'}\nРезультат: ${ok}/${ALL.length} · ${mins} мин\n`+lines.join('\n')+'\n\nКод результата: '+OgeAssignments.encode('RES-',{v:3,n:st.name,k:'test',t:'Кинематика 1–5',s:st.start,d:Math.round(((st.end||Date.now())-st.start)/1000),r:answers});
+  document.getElementById('finish').hidden=true;
+  progress();
+  if(!silent)document.getElementById('res').scrollIntoView({behavior:'smooth'});
+}
+document.getElementById('finish').onclick=()=>finish(false);
+document.getElementById('copy').onclick=async()=>{const t=document.getElementById('report'),button=document.getElementById('copy');try{await navigator.clipboard.writeText(t.value);button.textContent='Скопировано ✓'}catch{t.focus();t.select();button.textContent='Скопируй выделенный текст'}};
+document.getElementById('again').onclick=e=>{const b=e.currentTarget;if(!b.dataset.armed){b.dataset.armed=1;b.textContent='Точно стереть все ответы? Нажми ещё раз';return}LS.del(KEY);st={ans:{},start:Date.now(),done:false,name:st.name};LS.set(KEY,st);location.reload()};
+render();
+</script>
+<link rel="stylesheet" href="site-shell.css?v=20261105quiet"></body>
+</html>
