@@ -1,7 +1,5 @@
 # INVARIANT — занятия по ОГЭ
 
-Копия [INVARIANT](https://github.com/Inv1nced/zadachnik-oge) для GitHub Pages аккаунта `bh13creater`. Исходный проект и учебные материалы принадлежат их авторам.
-
 Основное рабочее место: [teach.html](teach.html).
 
 ## Как устроен сайт
