@@ -1,8 +1,24 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Задачник по физике · INVARIANT</title><link rel="stylesheet" href="site-shell.css?v=interface-1"><link rel="stylesheet" href="wordmark.css?v=chrome-1"><script src="site-shell.js?v=cloud-1" defer></script><link rel="stylesheet" href="physics-lab-loader.css?v=chrome-1"></head><body class="study-site">
-<script src="physics-lab-loader.js?v=chrome-1" data-lab-entry></script>
+<!doctype html>
+<html lang="ru" data-theme="light" data-type="software">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Задачи по темам ОГЭ по физике, тренировочные варианты и домашние задания.">
+<meta name="theme-color" content="#f5f5ef">
+<meta name="page-type" content="software">
+<meta name="site-kind" content="software">
+<title>ОГЭ по физике · INVARIANT</title>
+<script>
+  try {
+    if (localStorage.getItem('oge-theme') === 'dark') document.documentElement.dataset.theme = 'dark';
+  } catch {}
+</script>
+<link rel="stylesheet" href="site-shell.css?v=study-layout-1">
+<script src="site-shell.js?v=study-layout-1" defer></script>
+<link rel="stylesheet" href="physics-lab-loader.css?v=chrome-1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400..800&display=swap">
 <style>
 :root{
   color-scheme:dark;
@@ -64,9 +80,10 @@ textarea{font-family:var(--f-m);font-size:12.5px;width:100%;resize:vertical}
 .src.F{background:var(--ok-bg);color:var(--ok)} .src.D{background:rgba(255,95,210,.14);color:var(--pink)} .src.K{background:rgba(142,114,255,.16);color:#B9A8FF}
 .fig{display:block;max-width:min(100%,520px);height:auto;background:#fff;border-radius:10px;padding:8px;margin:10px 0;cursor:zoom-in;box-shadow:0 0 0 1px var(--line2),0 8px 24px rgba(0,0,0,.35);transition:transform .2s,box-shadow .2s}
 .fig:hover{transform:scale(1.01);box-shadow:0 0 0 1px var(--cyan),0 0 24px rgba(59,227,255,.3)}
-.lightbox{position:fixed;inset:0;z-index:70;background:rgba(3,6,15,.88);backdrop-filter:blur(6px);display:grid;place-items:center;padding:24px;cursor:zoom-out}
+.lightbox{width:max-content;max-width:calc(100% - 32px);max-height:calc(100dvh - 32px);border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);padding:12px;overscroll-behavior:contain}
+.lightbox::backdrop{background:rgba(12,22,17,.76)}
 .lightbox[hidden]{display:none}
-.lightbox img{max-width:min(960px,100%);max-height:90vh;background:#fff;border-radius:12px;padding:12px}
+.lightbox img{display:block;max-width:min(960px,100%);max-height:calc(100dvh - 116px);background:#fff;border-radius:8px;margin-top:8px}
 .pic{font-family:var(--f-m);font-size:11px;color:var(--amber);background:var(--amber-bg);padding:1px 6px;border-radius:4px;white-space:nowrap}
 /* modules */
 .mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:14px 0 6px}
@@ -80,7 +97,7 @@ textarea{font-family:var(--f-m);font-size:12.5px;width:100%;resize:vertical}
 .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .6s cubic-bezier(.2,.8,.2,1)}
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 4px}
 .tools input[type=search]{flex:1 1 240px}
-.chip{border:1px solid var(--line);background:transparent;color:var(--text2);font:500 13px var(--f-b);padding:6px 11px;border-radius:999px;cursor:pointer;transition:all .2s}
+.chip{border:1px solid var(--line);background:transparent;color:var(--text2);font:500 13px var(--f-b);padding:6px 11px;border-radius:999px;cursor:pointer}
 .chip:hover{color:var(--text);border-color:var(--line2)}
 .chip[aria-pressed="true"]{color:#04111A;background:var(--violet);border-color:var(--violet);box-shadow:0 0 14px rgba(142,114,255,.45)}
 /* lessons */
@@ -131,7 +148,7 @@ textarea{font-family:var(--f-m);font-size:12.5px;width:100%;resize:vertical}
 .field label{font-size:13px;color:var(--text2);font-weight:600}
 .lessonpick{display:flex;flex-wrap:wrap;gap:6px}
 .seg{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
-.seg button{border:0;background:transparent;color:var(--text2);font:600 14px var(--f-m);padding:8px 14px;cursor:pointer;transition:all .2s}
+.seg button{border:0;background:transparent;color:var(--text2);font:600 14px var(--f-m);padding:8px 14px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--cyan);color:#04111A}
 .testhead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);z-index:10;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:rgba(6,10,23,.85);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:14px 0}
 .timer{font-family:var(--f-m);font-weight:700;font-size:20px;color:var(--cyan);text-shadow:0 0 12px rgba(59,227,255,.45);font-variant-numeric:tabular-nums}
@@ -165,7 +182,7 @@ th{font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppe
 .pick{display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:start;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:rgba(11,18,38,.6);font-size:13.5px;cursor:pointer}
 .pick input{margin-top:3px;accent-color:var(--cyan)}
 .pick:has(input:checked){border-color:var(--cyan);background:rgba(59,227,255,.07)}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--panel2);border:1px solid var(--cyan);color:var(--text);padding:10px 16px;border-radius:12px;box-shadow:var(--glow);transition:all .3s;z-index:50;font-size:14px;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--panel2);border:1px solid var(--cyan);color:var(--text);padding:10px 16px;border-radius:12px;box-shadow:var(--glow);transition:opacity .3s,transform .3s;z-index:50;font-size:14px;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%)}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
 .foot{margin-top:40px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;max-width:75ch}
@@ -245,22 +262,47 @@ body.bd-open{overflow:hidden}
  .study-actions .btn { flex: 1 1 150px; }
 }
 </style>
-
-<div class="gridbg" aria-hidden="true"></div>
+<link rel="stylesheet" href="study-interface.css?v=study-layout-1">
+</head>
+<body class="study-site">
+<script src="physics-lab-loader.js?v=study-layout-1" data-lab-entry="Загружаем задачник…"></script>
+<a class="skip-link" href="#view">К содержанию</a>
 <div class="app">
-  <div class="topbar">
-    <a class="brand" href="index.html"><span class="physics-wordmark"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/invariant-wordmark-still.png?v=chrome-1"><img src="assets/invariant-wordmark.svg?v=chrome-1" alt="INVARIANT" width="333" height="39"></picture></span></a>
-    <div class="tabs" role="tablist" id="tabs">
-      <button class="tab" role="tab" data-v="bank" aria-selected="true">Задачник</button>
-      <button class="tab" role="tab" data-v="test" aria-selected="false">Тест</button>
-      <button class="tab" role="tab" data-v="hw" aria-selected="false">Домашка</button>
-      <button class="tab" role="tab" data-v="prog" aria-selected="false">Прогресс</button>
+  <header class="topbar">
+    <div class="study-header">
+      <a class="brand" href="index.html" translate="no">INVARIANT</a>
+      <nav class="site-nav study-nav" aria-label="Материалы и кабинет">
+        <a href="account.html">Кабинет</a>
+        <details class="study-menu">
+          <summary>Ещё</summary>
+          <div class="study-menu-links">
+            <a href="formuly.html">Формулы</a>
+            <a href="grafiki.html">Тренажёр графиков</a>
+            <a href="forces.html">Силы и векторы</a>
+            <a href="laboratory.html">Лаборатория</a>
+            <a href="teach.html">Журнал репетитора</a>
+            <button type="button" data-theme-toggle>Тёмная тема</button>
+          </div>
+        </details>
+      </nav>
     </div>
-  </div>
-  <main id="view"></main>
-  <p class="foot">Задачи — из открытого банка ФИПИ, проекта демоверсии 2026, сборника Камзеевой 2026 и каталога «Школково»; авторские — от репетитора. Нажми на рисунок, чтобы увеличить. По ссылке «Условие ↗» — задача на «Школково» с подсказками и решением. Твой прогресс хранится только в этом браузере.</p>
+    <div class="tabs" role="tablist" id="tabs" aria-label="Подготовка к ОГЭ">
+      <button class="tab" type="button" id="tab-bank" role="tab" data-v="bank" aria-controls="view" aria-selected="true" tabindex="0">Задачник</button>
+      <button class="tab" type="button" id="tab-test" role="tab" data-v="test" aria-controls="view" aria-selected="false" tabindex="-1">Тест</button>
+      <button class="tab" type="button" id="tab-hw" role="tab" data-v="hw" aria-controls="view" aria-selected="false" tabindex="-1">Домашка</button>
+      <button class="tab" type="button" id="tab-prog" role="tab" data-v="prog" aria-controls="view" aria-selected="false" tabindex="-1">Прогресс</button>
+    </div>
+  </header>
+  <main>
+    <div id="view" role="tabpanel" aria-labelledby="tab-bank" tabindex="0"></div>
+    <noscript><h1>ОГЭ по физике</h1><p>Включи JavaScript, чтобы открыть задачи и тренировочные варианты.</p></noscript>
+  </main>
+  <footer class="foot">В задачнике собраны задания ФИПИ, демоверсии 2026 года, сборника Камзеевой, каталога «Школково» и авторские задачи репетитора.</footer>
 </div>
-<div class="lightbox" id="lb" hidden><img alt="Рисунок крупно"></div>
+<dialog class="lightbox" id="lb" aria-label="Рисунок крупным планом" hidden>
+  <form method="dialog"><button type="submit" class="btn small">Закрыть рисунок</button></form>
+  <img alt="Рисунок к задаче">
+</dialog>
 <div class="bd" id="bd" hidden role="dialog" aria-label="Доска для решения">
  <div class="bd-bar" id="bdBar">
   <div class="bd-tool-strip" role="group" aria-label="Инструменты доски">
@@ -314,5 +356,7 @@ body.bd-open{overflow:hidden}
 <script src="bank/fipi-native.js?v=bank-coverage-1"></script>
 <script src="bank/block-practice.js?v=1"></script>
 <script src="cloud-client.js"></script>
-<script src="zadachnik.js?v=cloud-1"></script>
-<script src="workspace-bridge.js?v=bank-coverage-1"></script><link rel="stylesheet" href="study-interface.css?v=native-fipi"></body></html>
+<script src="zadachnik.js?v=study-layout-1"></script>
+<script src="workspace-bridge.js?v=bank-coverage-1"></script>
+</body>
+</html>

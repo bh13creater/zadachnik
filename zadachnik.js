@@ -89,7 +89,10 @@ const fmtText=t=>esc(t).replace(/\[рисунок\]/g,'<span class="pic">рис�
 function fmtRow(r){let k=0;const imgs=r[7]||[];let body=r[6];
  if([80176,35380,38211].includes(r[0])){body=body.split("|")[0].trim();if(r[0]===35380)body=body.replace("2t2","2t²");body+="\nВ ответе запиши сначала номер изменения "+(r[0]===38211?"модуля скорости, затем — модуля ускорения.":"модуля ускорения, затем — модуля скорости.")}
  if(r[8]?.fipi)body=body.replace(/\n*\[рисунок\]\n*/g,'[рисунок]');
- const html=esc(body).replace(/\[рисунок\]/g,()=>{const src=imgs[k++];return src?`<img class="fig" src="${src}" alt="Рисунок к задаче" loading="lazy">`:'<span class="pic">рисунок</span>'}).replace(/\[формула\]/g,'<span class="pic">формула</span>');
+ const html=esc(body).replace(/\[рисунок\]/g,()=>{
+  const src=imgs[k++];
+  return src?`<button type="button" class="fig-trigger" aria-label="Увеличить рисунок ${k}"><img class="fig" src="${src}" alt="Рисунок к задаче" loading="lazy"></button>`:'<span class="pic">рисунок</span>';
+ }).replace(/\[формула\]/g,'<span class="pic">формула</span>');
  return r[8]?.fipi||r[8]?.skill?html.replace(/\n/g,'<br>'):html;
 }
 const link=r=>`https://3.shkolkovo.online/catalog/${r[1]}/${r[0]}`;
@@ -154,12 +157,46 @@ const V=document.getElementById("view");
 const studyTopbar=document.querySelector('.study-site .topbar');
 new ResizeObserver(()=>document.body.style.setProperty('--topbar-height',`${studyTopbar.offsetHeight}px`)).observe(studyTopbar);
 
-function setView(v){view=v;document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v===v));render();window.scrollTo({top:0,behavior:"smooth"})}
-document.getElementById("tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)setView(t.dataset.v)});
+const tabs=document.getElementById('tabs');
+const studyTabs=[...tabs.querySelectorAll('.tab')];
+function setView(next){
+ const focusWasInView=V.contains(document.activeElement);
+ view=next;
+ for(const tab of studyTabs){
+  const selected=tab.dataset.v===view;
+  tab.setAttribute('aria-selected',selected);
+  tab.tabIndex=selected?0:-1;
+  if(selected)V.setAttribute('aria-labelledby',tab.id);
+ }
+ render();
+ if(focusWasInView)V.focus({preventScroll:true});
+ window.scrollTo(0,0);
+}
+tabs.addEventListener('click',event=>{
+ const tab=event.target.closest('.tab');
+ if(tab&&tab.dataset.v!==view)setView(tab.dataset.v);
+});
+tabs.addEventListener('keydown',event=>{
+ const index=studyTabs.indexOf(event.target);
+ if(index===-1)return;
+ const destinations={
+  ArrowLeft:(index+studyTabs.length-1)%studyTabs.length,
+  ArrowRight:(index+1)%studyTabs.length,
+  Home:0,
+  End:studyTabs.length-1,
+ };
+ if(!Object.hasOwn(destinations,event.key))return;
+ event.preventDefault();
+ const tab=studyTabs[destinations[event.key]];
+ tab.focus();
+ if(tab.dataset.v!==view)setView(tab.dataset.v);
+});
 function render(){document.body.dataset.frogAssessment=runs.test && !runs.test.done?"active":"inactive";window.dispatchEvent(new Event("oge-study-state"));({bank:renderBank,test:renderTest,hw:renderHw,prog:renderProg})[view]()}
 /* ====== BANK ====== */
 function lessonStats(l){const a=(byL[l]||[]).filter(r=>!r[8]?.archived);return [a.filter(r=>solved.has(r[0])).length,a.length]}
 function modStats(m){let s=0,n=0;m.l.forEach(l=>{const [a,b]=lessonStats(l);s+=a;n+=b});return [s,n]}
+const formatCount=new Intl.NumberFormat('ru-RU').format;
+let firstBankRender=true;
 function renderBank(){
   const fipi=bank.source==="fipi";
   const total=fipi?[...combinedBlocks.values()].reduce((sum,block)=>sum+block.rows.length,0):Object.values(COUNTS).reduce((sum,count)=>sum+count,0);
@@ -168,39 +205,66 @@ function renderBank(){
   const openN=sectionLessons.filter(id=>fipi?combinedBlocks.has(id):isOpen(id)).length;
   const catalog=section==="mechanics"?"fipi-mechanics.html":`fipi-mechanics.html?section=${section}`;
   const homework=runs.hw && !runs.hw.done ? runs.hw : null;
-  V.innerHTML=`<section class="view bank-view">
-  <div class="hero bank-hero">
-   <div class="bank-intro"><h1>Задачи по физике</h1>
-   <p class="lead">Выбери тему, реши задачу самостоятельно или открой её на доске для разбора.</p></div>
-   ${homework?`<aside class="bank-resume"><span>Домашка в процессе</span><strong>${esc(homework.title)}</strong><button class="btn primary" data-continue="hw">Продолжить домашку <span aria-hidden="true">→</span></button></aside>`:
-   `<dl class="bank-overview"><div><dt>${fipi?'Задач в подборке':'Задач в практике'}</dt><dd>${total}</dd></div><div><dt>${fipi?'Блоков в разделе':'Открыто в разделе'}</dt><dd>${openN}${fipi?'':` <span>из ${sectionLessons.length}</span>`}</dd></div><div><dt>Решено задач</dt><dd data-bank-solved>${fipi?fipiStats([...combinedBlocks.values()].flatMap(block=>block.rows))[0]:solved.size}</dd></div></dl>`}
-  </div>
+  V.innerHTML=`<div class="view bank-view">
+  <section class="hero bank-hero" aria-labelledby="bank-title"${firstBankRender?' data-enter':''}>
+   <div class="bank-intro">
+    <h1 id="bank-title">ОГЭ по физике</h1>
+    <p class="lead">Решай задачи по темам, проверяй ответы и собирай тренировочные варианты.</p>
+    <a class="btn primary" href="#modules-title">Выбрать тему <span aria-hidden="true">↓</span></a>
+   </div>
+   ${homework?`<aside class="bank-resume"><span>Домашка в процессе</span><strong>${esc(homework.title)}</strong><button class="btn" type="button" data-continue="hw">Продолжить домашку <span aria-hidden="true">→</span></button></aside>`:
+   `<dl class="bank-overview">
+    <div><dt>Решено задач</dt><dd data-bank-solved>${formatCount(fipi?fipiStats([...combinedBlocks.values()].flatMap(block=>block.rows))[0]:solved.size)}</dd></div>
+    <div><dt>${fipi?'Задач в подборке':'Задач в практике'}</dt><dd>${formatCount(total)}</dd></div>
+    <div><dt>${fipi?'Блоков в разделе':'Открыто в разделе'}</dt><dd>${openN}${fipi?'':` <span>из ${sectionLessons.length}</span>`}</dd></div>
+   </dl>`}
+  </section>
   <section class="bank-modules" aria-labelledby="modules-title">
-   <div class="bank-section-title"><h2 id="modules-title">Разделы физики</h2><a class="bank-text-link" href="${catalog}">Банк ФИПИ <span aria-hidden="true">↗</span></a></div>
+   <div class="bank-section-title"><h2 id="modules-title" tabindex="-1">Темы и задачи</h2><a class="bank-text-link" href="${catalog}">Банк ФИПИ <span aria-hidden="true">↗</span></a></div>
    <div class="bank-topics" id="bank-topics" role="group" aria-label="Разделы физики">${FIPI.sections.map(([id,name])=>`<button class="chip" data-section="${id}" aria-pressed="${section===id}">${name}</button>`).join('')}</div>
    ${!['mechanics','methods'].includes(section)?`<div class="bank-source" id="bank-source" role="group" aria-label="Источник задач">
     <button class="chip" data-source="fipi" aria-pressed="${fipi}">Основная подборка</button>
-    <button class="chip" data-source="practice" aria-pressed="${!fipi}">${section==="mechanics"?"Практика уроков":"Авторская практика"}</button>
+    <button class="chip" data-source="practice" aria-pressed="${!fipi}">Авторская практика</button>
    </div>`:''}
+   <div class="bank-workspace">
+   <section class="bank-module-list" aria-labelledby="bank-module-title">
+   <h3 id="bank-module-title">Темы раздела</h3>
    <div class="mods" id="mods">${MODULES.map((module,i)=>{
     if(module.section!==section)return '';
     if(fipi){
      const tasks=fipiModuleRows(module);
      const [done]=fipiStats(tasks);
-     return `<button class="mod" data-i="${i}" aria-pressed="${i===bank.mod}"><span class="module-symbol" aria-hidden="true"></span><span class="mn">${module.n}</span><span class="ms">${module.s}</span><span class="module-counts"><span>Заданий <b>${tasks.length}</b></span><span data-module-solved>Решено <b>${done}</b></span></span><span class="meter" aria-hidden="true"><i style="width:${tasks.length?done/tasks.length*100:0}%"></i></span></button>`;
+     return `<button class="mod" data-i="${i}" aria-pressed="${i===bank.mod}"><span class="mn">${module.n}</span><span class="module-counts"><span>Заданий <b>${tasks.length}</b></span><span data-module-solved>Решено <b>${done}</b></span></span><span class="meter" aria-hidden="true"><i style="width:${tasks.length?done/tasks.length*100:0}%"></i></span></button>`;
     }
     const [done,available]=modStats(module);
     const lessonsOpen=module.l.filter(isOpen).length;
-    return `<button class="mod" data-i="${i}" aria-pressed="${i===bank.mod}"><span class="module-symbol" aria-hidden="true"></span><span class="mn">${module.n}</span><span class="ms">${module.s}</span><span class="module-counts"><span>${section==="mechanics"?"Уроки":"Блоки"} <b>${lessonsOpen}/${module.l.length}</b></span><span data-module-solved>Решено <b>${done}</b></span></span><span class="meter" aria-hidden="true"><i style="width:${available?done/available*100:0}%"></i></span></button>`;
+    return `<button class="mod" data-i="${i}" aria-pressed="${i===bank.mod}"><span class="mn">${module.n}</span><span class="module-counts"><span>${section==="mechanics"?"Уроки":"Блоки"} <b>${lessonsOpen}/${module.l.length}</b></span><span data-module-solved>Решено <b>${done}</b></span></span><span class="meter" aria-hidden="true"><i style="width:${available?done/available*100:0}%"></i></span></button>`;
    }).join('')}</div>
+   </section>
+   <section class="bank-lessons" aria-labelledby="bank-lessons-title">
+    <div class="bank-lesson-heading">
+     <h3 id="bank-lessons-title" tabindex="-1">${MODULES[bank.mod].n}</h3>
+     <button class="btn small" id="freeBd" type="button">Чистая доска <span aria-hidden="true">↗</span></button>
+    </div>
+    <div class="bank-search">
+     <label for="bq">${fipi?'Поиск по условию или номеру ФИПИ':'Поиск по условию'}</label>
+     <input type="search" id="bq" name="task-search" placeholder="${fipi?'Например, 6E8FB0…':'Например, скорость…'}" value="${esc(bank.q)}" autocomplete="off">
+     <details class="bank-filters"${bank.type==='all'?'':' open'}>
+      <summary>Тип задачи</summary>
+      <div id="bt" role="group" aria-label="Тип задачи">${[["all","Все"],...Object.entries(TYPES)].map(([k,v])=>`<button class="chip" data-t="${k}" aria-pressed="${bank.type===k}">${v}</button>`).join("")}</div>
+     </details>
+    </div>
+    <details class="bank-unlock">
+     <summary>Открыть урок по коду</summary>
+     <form class="unlock" id="unlock-form"><label for="uc">Код урока</label><input type="text" id="uc" name="lesson-code" placeholder="Например, 3-AB12CD…" autocomplete="off" spellcheck="false"><button class="btn" type="submit" id="ub">Открыть урок</button><span id="um" role="status"></span></form>
+    </details>
+    <div id="lessons"></div>
+    ${section!=='mechanics'?'<a class="bank-text-link bank-external" href="https://3.shkolkovo.online/catalog?SubjectId=33" target="_blank" rel="noopener">Банк «Школково» <span aria-hidden="true">↗</span></a>':''}
+   </section>
+   </div>
   </section>
-  <div class="bank-utilities">
-   <form class="unlock" id="unlock-form"><label for="uc">Код урока</label><input type="text" id="uc" placeholder="Например, 3-AB12CD" autocomplete="off"><button class="btn" type="submit" id="ub">Открыть урок</button><span id="um" class="t2" role="status"></span></form>
-   <div class="bank-resources">${section==="mechanics"?'<a href="forces.html">Силы и векторы</a><a href="grafiki.html">Тренажёр графиков</a>':'<a href="https://3.shkolkovo.online/catalog?SubjectId=33" target="_blank" rel="noopener">Банк Школково ↗</a>'}<button class="btn board" id="freeBd">Чистая доска <span aria-hidden="true">↗</span></button></div>
-  </div>
-  <div class="tools"><input type="search" id="bq" aria-label="${fipi?'Поиск по условию или номеру ФИПИ':'Поиск по условию'}" placeholder="${fipi?'Условие или номер ФИПИ':'Найти задачу по условию'}" value="${esc(bank.q)}" autocomplete="off">
-   <div id="bt" style="display:flex;flex-wrap:wrap;gap:6px">${[["all","Все"],...Object.entries(TYPES)].map(([k,v])=>`<button class="chip" data-t="${k}" aria-pressed="${bank.type===k}">${v}</button>`).join("")}</div></div>
-  <div id="lessons"></div></section>`;
+  </div>`;
+  firstBankRender=false;
   renderLessons();
   V.querySelector('[data-continue="hw"]')?.addEventListener('click', () => setView('hw'));
   V.querySelector("#bank-topics").onclick=e=>{
@@ -218,11 +282,29 @@ function renderBank(){
    bank.source=b.dataset.source;clearBankFilters();renderBank();
    V.querySelector(`[data-source="${bank.source}"]`).focus({preventScroll:true});
   });
-  V.querySelector("#mods").onclick=e=>{const b=e.target.closest(".mod");if(!b)return;bank.mod=+b.dataset.i;LS.set("mk_mod",bank.mod);V.querySelectorAll(".mod").forEach(x=>x.setAttribute("aria-pressed",x===b));bank.open.clear();renderLessons()};
+  V.querySelector("#mods").onclick=e=>{
+   const button=e.target.closest('.mod');
+   if(!button)return;
+   bank.mod=Number(button.dataset.i);
+   LS.set('mk_mod',bank.mod);
+   for(const topic of V.querySelectorAll('.mod'))topic.setAttribute('aria-pressed',topic===button);
+   const heading=V.querySelector('#bank-lessons-title');
+   heading.textContent=MODULES[bank.mod].n;
+   bank.open.clear();
+   renderLessons();
+   if(matchMedia('(max-width: 830px)').matches){
+    heading.focus({preventScroll:true});
+    heading.scrollIntoView({block:'start'});
+   }
+  };
   const doUnlock=async()=>{const um=V.querySelector("#um");um.textContent="Проверяю…";um.style.color="";const r=await unlockCode(V.querySelector("#uc").value);if(view!=="bank"||!um.isConnected)return;
     if(r.err){um.textContent=r.err;um.style.color="var(--err)";const u=V.querySelector(".unlock");u.classList.remove("bad");void u.offsetWidth;u.classList.add("bad");return}
     const mi=MODULES.findIndex(m=>m.l.includes(r.l));bank.mod=mi;bank.source="practice";clearBankFilters();LS.set("mk_mod",mi);bank.open=new Set([r.l]);renderBank();toast(r.already?"Этот урок уже открыт":(r.l==="X"?"Бонус открыт!":"Урок "+r.l+" открыт!"));if(!r.already)confetti();
-    setTimeout(()=>{const d=V.querySelector(`.lesson[data-l="${r.l}"]`);if(d)d.scrollIntoView({behavior:"smooth",block:"start"})},250)};
+    const lesson=V.querySelector(`.lesson[data-l="${r.l}"]`);
+    if(lesson){
+     lesson.querySelector('summary').focus({preventScroll:true});
+     lesson.scrollIntoView({block:'start'});
+    }};
   V.querySelector("#unlock-form").onsubmit=e=>{e.preventDefault();doUnlock()};
   V.querySelector("#bq").oninput=e=>{bank.q=e.target.value.trim();renderLessons()};
   V.querySelector("#bt")?.addEventListener('click',e=>{const c=e.target.closest(".chip");if(!c)return;bank.type=c.dataset.t;V.querySelectorAll("#bt .chip").forEach(x=>x.setAttribute("aria-pressed",x===c));renderLessons()});
@@ -282,7 +364,7 @@ function renderFipiLessons(box,module){
 }
 function refreshFipiProgress(block){
  const overview=V.querySelector('[data-bank-solved]');
- if(overview)overview.textContent=fipiStats([...combinedBlocks.values()].flatMap(block=>block.rows))[0];
+ if(overview)overview.textContent=formatCount(fipiStats([...combinedBlocks.values()].flatMap(block=>block.rows))[0]);
  const details=V.querySelector(`[data-fipi-block="${block}"]`);
  if(details){
   const [done,total]=fipiStats(combinedBlocks.get(block).rows);
@@ -340,7 +422,7 @@ function lessonBody(l){
 }
 function refreshLessonMeta(lesson){
  const overview=V.querySelector('[data-bank-solved]');
- if(overview)overview.textContent=solved.size;
+ if(overview)overview.textContent=formatCount(solved.size);
  const details=V.querySelector(`.lesson[data-l="${lesson}"]`);
  if(details){
   const [done,total]=lessonStats(lesson);
@@ -418,9 +500,9 @@ let testCfg={lessons:new Set(["1"]),count:10,timer:true};
 function renderTest(){const run=runs.test;if(run)return run.done?renderResult(run):renderRun(run);
  testCfg.lessons=new Set([...testCfg.lessons].filter(isOpen));if(!testCfg.lessons.size)Object.keys(LESSONS).filter(isOpen).forEach(l=>testCfg.lessons.add(l));
  const avail=[...testCfg.lessons].reduce((a,l)=>a+(byL[l]||[]).filter(row=>!row[8]?.archived&&checkable(row)).length,0);
- V.innerHTML=`<section class="view"><div class="hero"><div class="kicker">Режим · <b>тестовый вариант</b></div><h1>Собери <span class="grad">вариант</span></h1><p class="lead">Выбери уроки — сайт наберёт случайные задачи с автопроверкой. В конце — оценка, разбор ошибок и код результата для репетитора.</p></div>
+ V.innerHTML=`<section class="view"><div class="hero"><h1>Тренировочный вариант</h1><p class="lead">Выбери уроки и количество задач. После сдачи увидишь результат и сможешь разобрать ошибки.</p></div>
  <div class="panel" style="display:grid;gap:16px">
-  <div class="field"><label for="nm">Как тебя зовут?</label><input type="text" id="nm" value="${esc(myName)}" placeholder="Имя" maxlength="40"></div>
+  <div class="field"><label for="nm">Твоё имя</label><input type="text" id="nm" name="student-name" autocomplete="given-name" value="${esc(myName)}" maxlength="40"></div>
   <div class="field"><label>Уроки</label>${MODULES.map((m,i)=>m.section==="methods"?"":`<div style="display:grid;gap:6px"><span class="muted" style="font-size:12px;font-family:var(--f-m);letter-spacing:.1em">МОДУЛЬ ${i+1} · ${m.n.toUpperCase()} <button class="linkbtn" data-mod="${i}">выбрать весь</button></span><div class="lessonpick">${m.l.map(l=>isOpen(l)?((byL[l]||[]).some(row=>!row[8]?.archived&&checkable(row))?`<button class="chip" data-l="${l}" aria-pressed="${testCfg.lessons.has(l)}">${l==="X"?"Бонус":"Урок "+l}</button>`:""):`<span class="chip" style="opacity:.45;cursor:default">🔒 ${l==="X"?"Бонус":"Урок "+l}</span>`).join("")}</div></div>`).join("")}</div>
   <div class="grid2"><div class="field"><label>Сколько задач</label><div class="seg" id="cnt">${[5,10,15,20].map(n=>`<button data-n="${n}" aria-pressed="${testCfg.count===n}">${n}</button>`).join("")}</div></div>
   <div class="field"><label>Таймер</label><div class="seg" id="tm"><button data-t="1" aria-pressed="${testCfg.timer}">2 мин / задача</button><button data-t="0" aria-pressed="${!testCfg.timer}">без таймера</button></div></div></div>
@@ -714,7 +796,7 @@ function renderHw() {
 }
 /* ====== PROGRESS ====== */
 function renderProg(){const att=Object.values(tries).reduce((a,t)=>a+t[0],0),cor=Object.values(tries).reduce((a,t)=>a+t[1],0);
- V.innerHTML=`<section class="view"><div class="hero"><div class="kicker">Статистика · <b>этот браузер</b></div><h1>Мой <span class="grad">прогресс</span></h1>
+ V.innerHTML=`<section class="view"><div class="hero"><h1>Твой прогресс</h1><p class="lead">Статистика занятий в этом браузере.</p>
  <div class="stats"><span class="stat"><b>${solved.size}</b>задач решено</span><span class="stat"><b>${att}</b>попыток</span><span class="stat"><b>${att?Math.round(cor/att*100):0}%</b>точность</span><span class="stat"><b>${history.length}</b>вариантов и домашек</span></div></div>
  <div class="grid2"><div class="panel"><div class="h2" style="font-size:18px;margin-bottom:8px">По урокам</div>${Object.keys(LESSONS).map(l=>{if(!isOpen(l))return `<div class="prow" style="opacity:.5"><span>🔒 ${l==="X"?"Бонус":"Урок "+l} · закрыт</span><span></span><span></span></div>`;const [s,n]=lessonStats(l);return `<div class="prow"><span>${l==="X"?"Бонус":"У"+l} · ${LESSONS[l][0]}</span><div class="meter"><i style="width:${n?s/n*100:0}%"></i></div><span class="num muted" style="text-align:right">${s}/${n}</span></div>`}).join("")}</div>
  <div class="panel"><div class="h2" style="font-size:18px;margin-bottom:8px">История</div>${history.length?`<div class="tablewrap"><table><thead><tr><th>Дата</th><th>Что</th><th>Итог</th><th></th></tr></thead><tbody>${history.map((h,i)=>`<tr><td class="num">${new Date(h.s).toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit"})}</td><td>${esc(h.t)}</td><td class="num" style="color:${grade(h.sc/h.n)[2]}">${h.n?`${h.sc}/${h.n}`:"ручная проверка"}${h.pending?` · ждут: ${h.pending}`:""}</td><td><button class="linkbtn" data-code="${i}">код</button></td></tr>`).join("")}</tbody></table></div>`:`<p class="t2">Пока пусто. Реши тестовый вариант или домашку — результат появится здесь.</p>`}
@@ -725,8 +807,17 @@ function renderProg(){const att=Object.values(tries).reduce((a,t)=>a+t[0],0),cor
 /* ====== effects ====== */
 function burst(el){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const r=el.getBoundingClientRect();for(let i=0;i<10;i++){const s=document.createElement("span");s.style.cssText=`position:fixed;left:${r.left+r.width/2}px;top:${r.top+r.height/2}px;width:6px;height:6px;border-radius:50%;background:${["#3BE3FF","#35F2A2","#8E72FF","#FF5FD2"][i%4]};pointer-events:none;z-index:60;transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .6s`;document.body.appendChild(s);const a=Math.PI*2*i/10,d=30+Math.random()*24;requestAnimationFrame(()=>{s.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`;s.style.opacity="0"});setTimeout(()=>s.remove(),650)}}
 function confetti(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const c=document.createElement("canvas");c.className="confetti";document.body.appendChild(c);const x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;const P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,s:4+Math.random()*5,c:["#3BE3FF","#35F2A2","#8E72FF","#FF5FD2","#FFBE55"][Math.floor(Math.random()*5)],r:Math.random()*6}));let f=0;(function loop(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore()});if(++f<110)requestAnimationFrame(loop);else c.remove()})()}
-document.addEventListener("click",e=>{const im=e.target.closest("img.fig");const lb=document.getElementById("lb");if(im){lb.querySelector("img").src=im.src;lb.hidden=false;return}if(e.target.closest("#lb"))lb.hidden=true});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("lb").hidden=true});
+const lightbox=document.getElementById('lb');
+document.addEventListener('click',event=>{
+ const figure=event.target.closest('.fig-trigger');
+ if(figure&&!lightbox.open){
+  const image=figure.querySelector('img');
+  lightbox.querySelector('img').src=image.currentSrc||image.src;
+  lightbox.hidden=false;
+  lightbox.showModal();
+ }else if(event.target===lightbox)lightbox.close();
+});
+lightbox.addEventListener('close',()=>{lightbox.hidden=true});
 function openLinkedBoard() {
  const params = new URLSearchParams(location.hash.slice(1));
  if (params.has('board') && params.has('room')) loadBoard().then(board => board.fromHash()).catch(error => toast(error.message));

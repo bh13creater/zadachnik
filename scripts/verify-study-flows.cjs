@@ -73,6 +73,9 @@ async function checkPublic(browser, base) {
   assert.ok(await page.locator('.frog-bubble').isVisible());
   await page.locator('.frog-close').click();
   assert.ok(!(await page.locator('.frog-bubble').isVisible()));
+  await page.setViewportSize({width:320,height:750});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
+  await page.setViewportSize({width:390,height:844});
 
   // Tasks must work even when the source websites are unavailable.
   await context.route(/https:\/\/(ege-fipi\.ru|oge\.fipi\.ru)\//, route=>route.abort());
@@ -95,6 +98,12 @@ async function checkPublic(browser, base) {
   const image=task.locator('img.fig');
   await image.evaluate(el=>el.decode());
   assert.ok(await image.evaluate(el=>el.naturalWidth>0));
+  const figure=task.locator('.fig-trigger');
+  await figure.press('Enter');
+  await page.getByRole('dialog',{name:'Рисунок крупным планом'}).waitFor();
+  await page.keyboard.press('Escape');
+  await page.locator('#lb').waitFor({state:'hidden'});
+  assert.ok(await figure.evaluate(element=>element===document.activeElement));
   await task.locator('input').fill('1234');
   await task.locator('[data-act="check"]').click();
   assert.match(await task.locator('.vslot').innerText(),/пока нет/);
