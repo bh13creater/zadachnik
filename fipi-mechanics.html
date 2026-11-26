@@ -4,26 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Задания ФИПИ по физике · ОГЭ</title>
-  <link rel="stylesheet" href="gravity-board.css?v=20261116">
-  <link rel="stylesheet" href="fipi-mechanics.css?v=native-fipi">
+  <link rel="stylesheet" href="site-theme.css?v=site-polish-1">
+  <script src="site-theme.js?v=site-polish-1"></script>
+  <link rel="stylesheet" href="fipi-mechanics.css?v=site-polish-1">
   <script src="bank/extra-physics.js?v=all-physics-1" defer></script>
   <script src="bank/fipi-tasks.js?v=fipi-1506" defer></script>
   <script src="bank/fipi-index.js?v=fipi-in-place" defer></script>
   <script src="bank/fipi-native.js?v=bank-coverage-1" defer></script>
   <script src="fipi-mechanics.js?v=native-fipi" defer></script>
 <link rel="stylesheet" href="physics-lab-loader.css?v=chrome-1"></head>
-<body>
+<body class="catalog-page">
 <script src="physics-lab-loader.js?v=chrome-1" data-lab-entry="Загружаем каталог…"></script>
   <header><a href="index.html" id="return-to-practice">← Задачник</a><span>ОГЭ · ФИПИ</span></header>
   <main class="catalog">
-    <p class="tag">ОГЭ по физике · открытый банк</p>
     <h1>Задания ФИПИ</h1>
     <p>Выбери раздел, тему или тип ответа. Если знаешь номер задания, введи его в поиск.</p>
     <nav id="sections" class="catalog-topics" aria-label="Разделы физики"></nav>
     <div class="filters">
       <label for="topic">Тема<select id="topic"></select></label>
       <label for="format">Тип ответа<select id="format"></select></label>
-      <label for="code">Номер ФИПИ<input id="code" type="search" placeholder="Например, F7DAF7" autocomplete="off"></label>
+      <label for="code">Номер ФИПИ<input id="code" type="search" name="code" placeholder="Например, F7DAF7…" autocomplete="off"></label>
     </div>
     <p id="count" role="status"></p>
     <ul id="tasks" class="cards"></ul>

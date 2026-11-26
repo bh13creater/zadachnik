@@ -1,0 +1,52 @@
+:root {
+  color-scheme: light;
+  --ui-page: #f4f3ed;
+  --ui-surface: #fffefa;
+  --ui-subtle: #eeeee6;
+  --ui-text: #202922;
+  --ui-secondary: #414d44;
+  --ui-muted: #566257;
+  --ui-border: #d8dcd1;
+  --ui-border-strong: #808d81;
+  --ui-accent: #28543e;
+  --ui-accent-ink: #fff;
+  --ui-accent-soft: #e3ebe0;
+  --ui-success: #216044;
+  --ui-success-soft: #e4f1e8;
+  --ui-danger: #9b3740;
+  --ui-danger-soft: #f8e9e9;
+  --ui-warning: #76501b;
+  --ui-warning-soft: #f6edd8;
+  --ui-plot-blue: #275f85;
+  --ui-plot-rust: #a04537;
+  --ui-plot-gold: #805719;
+  --ui-font: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ui-radius: 8px;
+  --ui-gutter: clamp(16px, 4vw, 40px);
+  --ui-reading: 760px;
+  --ui-frame: 1160px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ui-page: #191e1a;
+  --ui-surface: #222a24;
+  --ui-subtle: #2b342d;
+  --ui-text: #f0f2ec;
+  --ui-secondary: #cbd6ca;
+  --ui-muted: #afbfaf;
+  --ui-border: #415043;
+  --ui-border-strong: #77907b;
+  --ui-accent: #b7d8b9;
+  --ui-accent-ink: #1a3524;
+  --ui-accent-soft: #2d4134;
+  --ui-success: #a1d7af;
+  --ui-success-soft: #263d2e;
+  --ui-danger: #ffb1b3;
+  --ui-danger-soft: #492f34;
+  --ui-warning: #e9c387;
+  --ui-warning-soft: #423727;
+  --ui-plot-blue: #a0cdec;
+  --ui-plot-rust: #f1aa97;
+  --ui-plot-gold: #e6c18a;
+}

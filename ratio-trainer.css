@@ -1,1 +1,66 @@
-.trainer-main{display:block;max-width:980px;padding:30px 20px 60px}.trainer-main h1{font-size:clamp(30px,5vw,48px);line-height:1.15;letter-spacing:-1px}.intro{margin-bottom:28px}.training{padding:25px 30px;border:1px solid var(--line);border-radius:12px;background:white;margin:25px 0}.training h2{font-size:29px}.answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:24px 0 8px}.answer-grid label{font-size:14px;font-weight:bold}.answer-grid input{display:block;width:100%;padding:12px;margin-top:8px;font:inherit;font-size:21px;border:2px solid #9bb7a9;border-radius:5px;color:var(--ink);background:white}.answer-grid input[aria-invalid=true]{border-color:#b7472b}.answer-grid input.correct{border-color:#15735c;background:#f0faf3}#feedback{margin:20px 0;padding:0;min-height:30px}#hint-text{background:#fff1db;border-left:3px solid #ce8c31;padding:15px;margin:14px 0}.start-link{display:inline-block;background:#15735c;color:white;padding:14px 20px;border-radius:7px;text-decoration:none;font-weight:bold}#restart{font-size:12px;padding:6px 9px;background:transparent}.step-formula{font-family:Georgia,serif;font-size:30px}#progress{color:#15735c;font-weight:bold}#homework{scroll-margin-top:20px}@media(max-width:600px){.answer-grid{grid-template-columns:1fr}.training{padding:20px 16px}.trainer-main{padding:20px 12px}.training h2{font-size:25px}}
+.trainer-main { --material-width: 950px; }
+.trainer-main .intro { margin-bottom: 22px; }
+.trainer-main .tag { margin-bottom: 5px; }
+
+.training {
+  margin-block: 20px;
+  padding: clamp(15px, 4vw, 30px);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: var(--ui-surface);
+}
+
+.answer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-block: 14px 8px;
+}
+
+.answer-grid label {
+  display: grid;
+  align-content: space-between;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.answer-grid input {
+  width: 100%;
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid var(--ui-border-strong);
+  border-radius: var(--ui-radius);
+  background: var(--ui-page);
+  color: var(--ui-text);
+  font: 600 17px var(--ui-font);
+}
+.answer-grid input::placeholder { font-size: 14px; }
+.answer-grid input[aria-invalid="true"] { border-color: var(--ui-danger); background: var(--ui-danger-soft); }
+.answer-grid input.correct { border-color: var(--ui-success); background: var(--ui-success-soft); }
+
+#feedback:not(:empty) { margin-top: 12px; font-weight: 550; }
+#hint-text {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-inline-start: 2px solid var(--ui-warning);
+  background: var(--ui-warning-soft);
+}
+.trainer-main .intro .start-link,
+.trainer-main #restart {
+  padding-inline: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ui-accent);
+  text-decoration: underline;
+  text-underline-offset: .16em;
+}
+.trainer-main #restart:not(:disabled):hover { background: transparent; text-decoration-thickness: 2px; }
+#restart { margin-top: 8px; }
+.trainer-main .step-formula { font: clamp(21px, 4vw, 30px)/1.3 Georgia, serif; }
+.trainer-main #progress { margin-bottom: 4px; color: var(--ui-muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+#homework .small { margin-top: 10px; margin-bottom: 0; }
+
+@media (max-width: 620px) {
+  .answer-grid { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+}

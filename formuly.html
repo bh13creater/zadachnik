@@ -47,8 +47,15 @@ h2{font:700 18px var(--f-d);margin:0 0 10px}
 .score{font:600 13px var(--f-m);color:var(--text2)}.score b{color:var(--ok)}
 .hint{font-size:14px;color:var(--amber);font-weight:600}
 @media (max-width:640px){.opts{grid-template-columns:1fr}.q{font-size:19px}}
-</style><link rel="stylesheet" href="site-shell.css?v=20261105quiet"><script src="site-shell.js?v=frog-ai-2" defer></script></head><body><div class="gridbg"></div><div class="app">
-<header class="topbar"><a class="brand" href="./"><i></i>ОГЭ · Формулы</a><nav class="tabs" id="tabs"><button class="tab" data-v="rules">Правила</button><button class="tab" data-v="drill">Тренажёр</button></nav><span class="sp"></span><a class="lk" href="grafiki.html">Тренажёр движения</a><a class="lk" href="./">Задачник</a></header>
+</style><script src="site-theme.js?v=site-polish-1"></script><link rel="stylesheet" href="site-shell.css?v=site-polish-1"><link rel="stylesheet" href="study-tools.css?v=site-polish-1"><script src="site-shell.js?v=site-polish-1" defer></script></head><body class="study-tool study-formulas"><div class="gridbg"></div><div class="app">
+<header class="topbar">
+  <span class="tool-name">Формулы</span>
+  <a class="tool-link" href="grafiki.html">Тренажёр графиков</a>
+  <nav class="tabs" id="tabs" aria-label="Разделы тренажёра">
+    <button class="tab" type="button" data-v="rules">Правила</button>
+    <button class="tab" type="button" data-v="drill">Тренажёр</button>
+  </nav>
+</header>
 <main id="view"></main></div>
 <script>
 const $=s=>document.querySelector(s);const V=$("#view");
@@ -104,7 +111,7 @@ function drawDrill(){const {q,opts}=D.cur;
   const chk=`<div class="chk"><b>Проверка числами:</b> пусть ${nums}. Тогда должно выйти ${q.x} = ${fmt(right)}.${ok?` Твоя формула даёт ${fmt(mine)} ✓`:` Твоя формула даёт ${fmt(mine)} — не сходится ✗`}</div>`;
   $("#fb").innerHTML=`<div class="fb ${ok?"ok":"no"}"><b>${ok?"✓ Верно!":"✗ Не так. Смотри по шагам:"}</b><div class="steps">${q.f}<br>${q.st.map(s=>`${s[0]}<span class="c">← ${s[1]}</span>`).join("<br>")}</div>${chk}</div><div class="row"><button class="btn" id="nx">Дальше →</button></div>`;
   $("#nx").onclick=next;$(".kicker .score").innerHTML=`верно <b>${D.ok}</b> из ${D.n}`}}
-function setView(v){document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v===v));if(v==="rules")V.innerHTML=R;else next();window.scrollTo({top:0})}
+function setView(v){document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-pressed",t.dataset.v===v));if(v==="rules")V.innerHTML=R;else next();window.scrollTo({top:0})}
 $("#tabs").onclick=e=>{const t=e.target.closest(".tab");if(t)setView(t.dataset.v)};
 setView(location.hash==="#drill"?"drill":"rules");
-</script><link rel="stylesheet" href="site-shell.css?v=20261105quiet"></body></html>
+</script></body></html>

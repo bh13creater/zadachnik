@@ -210,6 +210,15 @@ async function checkPublic(browser, base) {
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   }
   await page.goto('grafiki.html');
+  await page.getByRole('tab',{name:'Смотри'}).focus();
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.getByRole('tab',{name:'Ускорение'}).getAttribute('aria-selected'),'true');
+  const materials=page.locator('.legacy-nav .study-menu summary');
+  await materials.press('Enter');
+  assert.ok(await page.getByRole('link',{name:'Лаборатория',exact:true}).first().isVisible());
+  await page.keyboard.press('Escape');
+  assert.equal(await materials.evaluate(element=>element.parentElement.open),false);
+  assert.ok(await materials.evaluate(element=>element===document.activeElement));
   const fieldWasRendered = await page.evaluate(()=>{
     for (let i=0;i<100;i++) {
       G.q=genQuestion();

@@ -35,10 +35,13 @@ const navButton = document.createElement('button');
 navButton.id = 'frog-nav-toggle';
 navButton.type = 'button';
 const siteNav = document.querySelector('.site-nav');
-navButton.textContent = siteNav?.classList.contains('study-nav') ? 'Помощник' : '🐸 Помощник';
+navButton.textContent = 'Помощник';
 navButton.setAttribute('aria-controls', 'frog-chat');
 navButton.setAttribute('aria-expanded', 'false');
-siteNav?.append(navButton);
+if (siteNav) {
+  siteNav.append(navButton);
+  frog.classList.add('frog-in-navigation');
+}
 
 const bubble = frog.querySelector('.frog-bubble');
 const closeButton = frog.querySelector('.frog-close');
