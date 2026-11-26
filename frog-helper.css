@@ -207,5 +207,26 @@
 @media print { .oge-frog, #frog-nav-toggle, [data-frog-task] { display: none !important; } }
 
 #frog-nav-toggle { margin-left: 0; }
+.oge-frog.frog-in-navigation {
+  --frog-surface: var(--ui-surface, #fffefa);
+  --frog-ink: var(--ui-text, #202922);
+  --frog-muted: var(--ui-muted, #566257);
+  --frog-border: var(--ui-border-strong, #808d81);
+  --frog-tint: var(--ui-accent-soft, #e3ebe0);
+  --frog-accent: var(--ui-accent, #28543e);
+  --frog-button-ink: var(--ui-accent-ink, #fff);
+}
+.frog-in-navigation .frog-body { display: none; }
+.frog-in-navigation .frog-bubble {
+  bottom: 0;
+  border-color: var(--frog-border);
+  background: var(--frog-surface);
+}
+.frog-in-navigation.is-talking .frog-bubble:not([hidden]) {
+  animation: frog-bubble-in .18s cubic-bezier(.23, 1, .32, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .frog-in-navigation.is-talking .frog-bubble:not([hidden]) { animation: none; }
+}
 .workspace-embed .oge-frog, .workspace-embed [data-frog-task],
 body[data-frog-assessment="active"] [data-frog-task] { display: none; }

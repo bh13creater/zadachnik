@@ -1,44 +1,25 @@
 /* The protected cabinet shares typography and form primitives with teach.css. */
 .teacher-app--compact {
-  --bg: #171722;
-  --bg2: #222232;
-  --panel: #1e1e2c;
-  --line: #36364a;
-  --text: #f3f0fb;
-  --text2: #d1cadf;
-  --muted: #bcb4ce;
-  --cyan: #c3b2fc;
-  --accent-fill: #ac94f1;
-  --accent-ink: #201534;
-  --accent-soft: #342846;
-  --ok: #9fe0bd;
-  --err: #ffa8bc;
-  --amber: #f3cf95;
-  color-scheme: dark;
+  --bg: var(--ui-page);
+  --bg2: var(--ui-subtle);
+  --panel: var(--ui-surface);
+  --line: var(--ui-border);
+  --text: var(--ui-text);
+  --text2: var(--ui-secondary);
+  --muted: var(--ui-muted);
+  --cyan: var(--ui-accent);
+  --accent-fill: var(--ui-accent);
+  --accent-ink: var(--ui-accent-ink);
+  --accent-soft: var(--ui-accent-soft);
+  --ok: var(--ui-success);
+  --err: var(--ui-danger);
+  --amber: var(--ui-warning);
   font-size: .9375rem;
   line-height: 1.55;
   color: var(--text);
   background: var(--bg);
   min-height: 100vh;
   max-width: none;
-}
-
-html[data-theme=light] .teacher-app--compact {
-  --bg: #f7f6fa;
-  --bg2: #efebf6;
-  --panel: #fff;
-  --line: #dcd6e7;
-  --text: #231b32;
-  --text2: #453a54;
-  --muted: #62566f;
-  --cyan: #5e398d;
-  --accent-fill: #6842a0;
-  --accent-ink: #fff;
-  --accent-soft: #eee5fa;
-  --ok: #246741;
-  --err: #a1294a;
-  --amber: #79530e;
-  color-scheme: light;
 }
 
 .cabinet-header {
@@ -50,7 +31,7 @@ html[data-theme=light] .teacher-app--compact {
 }
 
 .cabinet-top {
-  width: min(100% - 48px, 1120px);
+  width: min(100% - var(--ui-gutter) * 2, var(--ui-frame));
   min-height: 63px;
   margin-inline: auto;
   display: grid;
@@ -139,7 +120,7 @@ html[data-theme=light] .teacher-app--compact {
 .cabinet-menu-items > :is(a,button):hover { background: var(--bg2); }
 
 .teacher-app--compact #teacher-view {
-  width: min(100% - 48px, 1120px);
+  width: min(100% - var(--ui-gutter) * 2, var(--ui-frame));
   margin: auto;
   padding: 35px 0 54px;
 }
@@ -327,14 +308,13 @@ html[data-theme=light] .teacher-app--compact {
 }
 @media (max-width: 740px) {
   .cabinet-top {
-    width: calc(100% - 28px);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 4px 8px;
     padding-top: 7px;
   }
   .cabinet-nav { grid-row: 2; grid-column: 1 / -1; padding: 3px 0 7px; gap: 3px; }
   .cabinet-nav > a { flex: 1 1 auto; justify-content: center; padding-inline: 5px; }
-  .teacher-app--compact #teacher-view { width: calc(100% - 28px); padding-top: 22px; }
+  .teacher-app--compact #teacher-view { padding-top: 22px; }
   .phase-links { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
   .phase-links a { white-space: nowrap; }
   .lesson-phase { scroll-margin-top: 112px; }

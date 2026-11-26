@@ -34,7 +34,7 @@ async function openPreset(page, landing, quiz, written) {
   assert.equal(await page.locator('.study-questions .q textarea').count(),written);
 }
 
-async function checkStartupLoader(browser,base) {
+async function checkBankStartup(browser,base) {
   const context=await browser.newContext({baseURL:base,viewport:{width:390,height:844}});
   let releaseIntro;
   const introGate = new Promise(resolve => { releaseIntro = resolve; });
@@ -45,18 +45,16 @@ async function checkStartupLoader(browser,base) {
       await route.continue();
     });
     await page.goto('index.html',{waitUntil:'commit'});
-    const overlay=page.locator('.physics-lab-overlay');
-    await overlay.waitFor();
-    assert.equal(await overlay.getByRole('img',{name:'INVARIANT'}).count(),1);
-    assert.equal(await overlay.locator('.physics-lab-progress span').count(),12);
-    assert.equal(await overlay.locator('.physics-lab-orbits').evaluate(node=>getComputedStyle(node).animationName),'physics-lab-orbit');
-    await page.emulateMedia({reducedMotion:'reduce'});
-    assert.equal(await overlay.locator('.physics-lab-orbits').evaluate(node=>getComputedStyle(node).animationName),'none');
+    const loading=page.getByRole('status').filter({hasText:'Загружаем задачник'});
+    await loading.waitFor();
+    assert.ok(await page.getByRole('tab',{name:'Задачник'}).isVisible());
+    assert.equal(await page.locator('.physics-lab-overlay').count(),0);
     releaseIntro();
-    await overlay.waitFor({state:'detached'});
-    await page.locator('.bank-title, #bank-topics').first().waitFor();
+    await loading.waitFor({state:'detached'});
+    await page.locator('#bank-topics').waitFor();
     await page.goto('index.html?workspace=1');
-    assert.equal(await overlay.count(),0);
+    await page.locator('#bank-topics').waitFor();
+    assert.equal(await page.locator('.physics-lab-overlay').count(),0);
   }finally{releaseIntro();await context.close()}
 }
 async function checkPublic(browser, base) {
@@ -73,6 +71,19 @@ async function checkPublic(browser, base) {
   assert.ok(await page.locator('.frog-bubble').isVisible());
   await page.locator('.frog-close').click();
   assert.ok(!(await page.locator('.frog-bubble').isVisible()));
+  await page.locator('#bt').selectOption('b');
+  await page.locator('#lessons .task').first().waitFor();
+  assert.ok(await page.locator('#lessons .task [data-act="check"]').count()>0);
+  await page.locator('#bt').selectOption('all');
+  await page.getByText('Открыть урок по коду',{exact:true}).click();
+  await page.locator('#uc').fill('abc');
+  await page.locator('#ub').click();
+  assert.equal(await page.locator('#uc').getAttribute('aria-invalid'),'true');
+  assert.match(await page.locator('#um').textContent(),/3-AB12CD/);
+  await page.getByText('Открыть урок по коду',{exact:true}).click();
+  await page.setViewportSize({width:320,height:750});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
+  await page.setViewportSize({width:390,height:844});
 
   // Tasks must work even when the source websites are unavailable.
   await context.route(/https:\/\/(ege-fipi\.ru|oge\.fipi\.ru)\//, route=>route.abort());
@@ -95,6 +106,12 @@ async function checkPublic(browser, base) {
   const image=task.locator('img.fig');
   await image.evaluate(el=>el.decode());
   assert.ok(await image.evaluate(el=>el.naturalWidth>0));
+  const figure=task.locator('.fig-trigger');
+  await figure.press('Enter');
+  await page.getByRole('dialog',{name:'Рисунок крупным планом'}).waitFor();
+  await page.keyboard.press('Escape');
+  await page.locator('#lb').waitFor({state:'hidden'});
+  assert.ok(await figure.evaluate(element=>element===document.activeElement));
   await task.locator('input').fill('1234');
   await task.locator('[data-act="check"]').click();
   assert.match(await task.locator('.vslot').innerText(),/пока нет/);
@@ -111,6 +128,8 @@ async function checkPublic(browser, base) {
   assert.equal(await page.locator('#bdTb img.fig').count(),1);
   assert.equal(await page.locator('#bdTb iframe').count(),0);
   await page.locator('#bdClose').click();
+  await page.locator('#tab-prog').click();
+  assert.equal(await page.locator('[data-fipi-progress]').textContent(),'1');
   await page.reload();
   await task.waitFor();
   assert.ok(await task.evaluate(el=>el.classList.contains('ok')));
@@ -179,12 +198,27 @@ async function checkPublic(browser, base) {
   const impulseMessage = await page.locator('#msg').inputValue();
   await page.reload();
   assert.equal(await page.locator('#msg').inputValue(),impulseMessage);
+  await page.locator('#tab-test').click();
+  await page.locator('#fin').waitFor();
+  const testAnswers=await page.evaluate(()=>runs.test.ids.map(id=>({id,answer:String(byId[id][4])})));
+  for(const {id,answer} of testAnswers)await page.locator(`#q${id}`).fill(answer);
+  await page.locator('#fin').click();
+  assert.match(await page.locator('#msg').inputValue(),new RegExp(`Автопроверка: ${testAnswers.length}/${testAnswers.length}`));
 
   for (const board of ['gravity-board.html','dynamics-lesson.html']) {
     await page.goto(board);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   }
   await page.goto('grafiki.html');
+  await page.getByRole('tab',{name:'Смотри'}).focus();
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.getByRole('tab',{name:'Ускорение'}).getAttribute('aria-selected'),'true');
+  const materials=page.locator('.legacy-nav .study-menu summary');
+  await materials.press('Enter');
+  assert.ok(await page.getByRole('link',{name:'Лаборатория',exact:true}).first().isVisible());
+  await page.keyboard.press('Escape');
+  assert.equal(await materials.evaluate(element=>element.parentElement.open),false);
+  assert.ok(await materials.evaluate(element=>element===document.activeElement));
   const fieldWasRendered = await page.evaluate(()=>{
     for (let i=0;i<100;i++) {
       G.q=genQuestion();
@@ -584,7 +618,7 @@ async function checkTeacher(browser,base,bank,source) {
   const executablePath=process.env.OGE_CHROME || undefined;
   const browser=await chromium.launch({executablePath});
   try {
-    await checkStartupLoader(browser,base);
+    await checkBankStartup(browser,base);
     const bank=await checkPublic(browser,base);
     const privateSource=path.resolve(process.env.OGE_PRIVATE_SOURCE||path.join(root,'../site-private-source'));
     if (fs.existsSync(privateSource)) await checkTeacher(browser,base,bank,privateSource);

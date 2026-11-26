@@ -26,8 +26,8 @@
   function start(label, {delay=0, minimum=360, timeout=3200}={}) {
     if (!document.body || window.self!==window.top) return ()=>{};
     const theme=()=>{
-      try{return localStorage.getItem('oge-theme')==='light'?'light':'dark'}
-      catch{return 'dark'}
+      try{return localStorage.getItem('oge-theme')==='dark'?'dark':'light'}
+      catch{return 'light'}
     };
     let overlay, shownAt=0, finished=false, closeTimer;
     const show=()=>{
